@@ -93,17 +93,31 @@ sudo apt update && sudo apt upgrade -y
 ## 4. Docker Engine 설치
 
 > Docker Desktop이 아닌 **WSL 안에 직접 설치**하는 방법입니다.
-> 프로젝트마다 환경이 달라도 Docker가 격리해주기 때문에 WSL에 직접 설치할 필요가 없습니다.
+> 이렇게 하면 Node.js, PHP, MySQL 등 언어나 DB를 WSL에 직접 설치하지 않아도 됩니다.
+> Docker가 각각의 실행 환경을 격리해서 관리해주기 때문입니다.
+
+Ubuntu는 `apt`라는 패키지 관리자를 통해 프로그램을 설치합니다.
+Docker는 Ubuntu 기본 저장소에 포함되어 있지 않기 때문에, **Docker 공식 저장소를 먼저 등록**한 뒤 설치해야 합니다.
+4-1 ~ 4-3 단계가 바로 그 등록 과정입니다.
 
 ### 4-1. 필수 패키지 설치
 
-Ubuntu 터미널에서 실행합니다.
+저장소 등록에 필요한 도구들을 먼저 설치합니다.
+
+- `ca-certificates` : HTTPS 통신을 위한 인증서
+- `curl` : URL에서 파일을 다운로드하는 도구
+- `gnupg` : 파일의 서명을 검증하는 도구
+- `lsb-release` : Ubuntu 버전 정보를 확인하는 도구
 
 ```bash
 sudo apt install -y ca-certificates curl gnupg lsb-release
 ```
 
 ### 4-2. Docker 공식 GPG 키 추가
+
+> **GPG 키란?**
+> 인터넷에서 파일을 받을 때 "이 파일이 진짜 Docker가 만든 것인지" 검증하는 디지털 서명입니다.
+> 이 키를 등록해두면 나중에 Docker를 설치하거나 업데이트할 때 위조된 파일이 설치되는 것을 막아줍니다.
 
 ```bash
 sudo mkdir -p /etc/apt/keyrings
@@ -112,6 +126,11 @@ curl -fsSL https://download.docker.com/linux/ubuntu/gpg | \
 ```
 
 ### 4-3. Docker 저장소 추가
+
+> **저장소(Repository)란?**
+> apt가 프로그램을 찾아서 설치하는 "출처 목록"입니다.
+> 여기서는 Docker 공식 주소를 그 목록에 추가하는 작업입니다.
+> 이 단계가 없으면 apt가 Docker를 어디서 받아야 할지 모릅니다.
 
 ```bash
 echo \
@@ -123,6 +142,13 @@ echo \
 
 ### 4-4. Docker Engine 설치
 
+저장소 등록이 완료됐으니 이제 실제로 Docker를 설치합니다.
+
+- `docker-ce` : Docker 엔진 본체
+- `docker-ce-cli` : 터미널에서 docker 명령을 사용하게 해주는 도구
+- `containerd.io` : 컨테이너를 실제로 실행하는 런타임
+- `docker-compose-plugin` : 여러 컨테이너를 한 번에 관리하는 `docker compose` 명령 추가
+
 ```bash
 sudo apt update
 sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
@@ -130,17 +156,22 @@ sudo apt install -y docker-ce docker-ce-cli containerd.io docker-compose-plugin
 
 ### 4-5. Docker 서비스 시작
 
+설치 후 Docker 엔진을 실행합니다.
+
 ```bash
 sudo service docker start
 ```
 
-### 4-6. 현재 사용자를 docker 그룹에 추가 (sudo 없이 사용)
+### 4-6. 현재 사용자를 docker 그룹에 추가
+
+기본적으로 docker 명령은 관리자 권한(`sudo`)이 필요합니다.
+아래 명령을 실행하면 매번 `sudo`를 붙이지 않아도 됩니다.
 
 ```bash
 sudo usermod -aG docker $USER
 ```
 
-터미널을 **완전히 닫고 다시 열어야** 적용됩니다.
+> 터미널을 **완전히 닫고 다시 열어야** 적용됩니다.
 
 ### 4-7. 설치 확인
 
@@ -154,6 +185,7 @@ docker compose version
 ### 4-8. WSL 시작 시 Docker 자동 실행 설정
 
 WSL을 열 때마다 Docker를 수동으로 시작하지 않도록 설정합니다.
+아래 명령은 터미널이 열릴 때마다 Docker를 자동으로 켜주는 한 줄을 설정 파일에 추가합니다.
 
 ```bash
 echo 'sudo service docker start > /dev/null 2>&1' >> ~/.bashrc
