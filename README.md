@@ -407,3 +407,11 @@ Windows 경로를 Docker에 mount하면 파일 I/O 속도가 매우 느립니다
 | 실행환경 (Node, PHP, DB 등) | Docker 컨테이너 |
 | 코드 편집 | VSCode 또는 PhpStorm (WSL 연결) |
 | 패키지 설치 | Docker 컨테이너 안에서 실행 |
+
+---
+
+## 다음 단계
+
+로컬 도메인 및 서브도메인 설정 관련 가이드는 아래를 참고하세요.
+
+→ [로컬 도메인 설정 가이드](./README-domain.md)
